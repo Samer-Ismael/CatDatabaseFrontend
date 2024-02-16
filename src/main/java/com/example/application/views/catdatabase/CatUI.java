@@ -10,7 +10,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -25,15 +27,18 @@ import java.util.List;
 @Route("")
 public class CatUI extends VerticalLayout {
 
-    private final String backendUrl = getElement().getProperty("server.url");
-
+    private final ServerUrl serverUrl;
+    private String backendUrl;
     private final Grid<Cat> catGrid = new Grid<>(Cat.class);
     private final TextField name = new TextField("Name");
     private final TextField color = new TextField("Color");
     private final TextField age = new TextField("Age");
 
-    public CatUI() {
-        //this.backendUrl = backendUrl;
+
+    public CatUI(ServerUrl serverUrl) {
+        this.serverUrl = serverUrl;
+        this.backendUrl = serverUrl.getUrl();
+
 
         catGrid.setColumns("id", "name", "color", "age");
 
