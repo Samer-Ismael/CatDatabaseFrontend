@@ -22,20 +22,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-@Component
 @Route("")
 public class CatUI extends VerticalLayout {
 
-    @Value("${server.url}")
-    private final String backendUrl; // This will get the url from the application.properties file
+    private final String backendUrl =  "http://samer.eu-north-1.elasticbeanstalk.com";
             //"http://samer.eu-north-1.elasticbeanstalk.com";
     private final Grid<Cat> catGrid = new Grid<>(Cat.class);
     private final TextField name = new TextField("Name");
     private final TextField color = new TextField("Color");
     private final TextField age = new TextField("Age");
 
-    public CatUI(String backendUrl) {
-        this.backendUrl = backendUrl;
+    public CatUI() {
+        //this.backendUrl = backendUrl;
 
         catGrid.setColumns("id", "name", "color", "age");
 
