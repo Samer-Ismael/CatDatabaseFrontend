@@ -173,21 +173,17 @@ public class CatUI extends VerticalLayout {
 
     private boolean isServerAvailable() {
         try {
-            // Replace "/health" with the actual endpoint you want to check
             URL url = new URL(backendUrl + "/cat/all");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Set a timeout for the connection (e.g., 5 seconds)
             connection.setConnectTimeout(5000);
 
             int responseCode = connection.getResponseCode();
 
-            // If the response code is in the range 200-299, it means the server is available
             return responseCode >= 200 && responseCode < 300;
         } catch (Exception e) {
-            // Log the exception if needed
-            return false; // Server is not available
+            return false;
         }
     }
 
