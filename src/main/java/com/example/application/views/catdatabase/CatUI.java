@@ -25,8 +25,8 @@ import java.util.List;
 @Route("")
 public class CatUI extends VerticalLayout {
 
-    private final String backendUrl =  "http://samer.eu-north-1.elasticbeanstalk.com";
-            //"http://samer.eu-north-1.elasticbeanstalk.com";
+    private final String backendUrl = getElement().getProperty("server.url");
+
     private final Grid<Cat> catGrid = new Grid<>(Cat.class);
     private final TextField name = new TextField("Name");
     private final TextField color = new TextField("Color");
