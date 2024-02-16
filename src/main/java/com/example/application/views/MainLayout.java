@@ -1,7 +1,7 @@
 package com.example.application.views;
 
 
-import com.example.application.views.catdatabase.CatDatabaseView;
+import com.example.application.views.catdatabase.CatUI;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Div;
@@ -101,7 +101,7 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo("Cat Database", LineAwesomeIcon.CHEESE_SOLID.create(), CatDatabaseView.class), //
+                new MenuItemInfo("Cat Database", LineAwesomeIcon.CHEESE_SOLID.create(), CatUI.class), //
 
         };
     }
