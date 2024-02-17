@@ -4,6 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -38,8 +39,16 @@ public class CatUI extends VerticalLayout {
 
         Image image = getImage();
 
-        HorizontalLayout imageLayout = new HorizontalLayout(image);
-        imageLayout.setAlignItems(Alignment.START);
+        Span serverMessageSpan = new Span();
+        serverMessageSpan.getStyle()
+                .set("text-align", "center")
+                .set("font-size", "20px")  // Adjust font size as needed
+                .set("font-family", "Arial, sans-serif"); // Specify font family for better appearance
+
+        serverMessageSpan.getStyle().set("text-align", "center");
+
+        VerticalLayout imageLayout = new VerticalLayout(image, serverMessageSpan); // Use VerticalLayout instead of HorizontalLayout
+        imageLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         HorizontalLayout inputLayout = new HorizontalLayout(name, color, age);
         inputLayout.setSpacing(true);
@@ -59,6 +68,9 @@ public class CatUI extends VerticalLayout {
 
         add(imageLayout, inputLayout, buttonLayout, catGrid);
 
+        String message = serverMessage();
+        serverMessageSpan.setText(message);
+
         if (!isServerAvailable()) {
             showServerDownNotification();
         } else {
@@ -68,6 +80,18 @@ public class CatUI extends VerticalLayout {
             Cat selectedCat = event.getValue();
             populateFieldsWithSelectedCatInfo(selectedCat);
         });
+    }
+
+    private String serverMessage() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            // Make a GET request to the server endpoint
+            return restTemplate.getForObject(backendUrl + "/server", String.class);
+        } catch (Exception e) {
+            // Handle any exceptions
+            return "";
+        }
     }
 
     private void addListenerToButtons(Button addCatButton, Button updateCatButton, Button deleteCatButton, Button swaggerButton, Button clearButton) {
@@ -138,13 +162,10 @@ public class CatUI extends VerticalLayout {
         }
     }
 
-
     private void updateCat() {
         Cat selectedCat = catGrid.asSingleSelect().getValue();
         if (selectedCat != null) {
             try {
-                // Populate the text fields with the selected cat's information
-                populateFieldsWithSelectedCatInfo(selectedCat);
 
                 // Update the selected cat's properties with the values from the text fields
                 selectedCat.setName(name.getValue());
@@ -171,7 +192,6 @@ public class CatUI extends VerticalLayout {
             Notification.show("Select a cat to update", 3000, Notification.Position.TOP_CENTER);
         }
     }
-
 
     private void deleteCat() {
         Cat selectedCat = catGrid.asSingleSelect().getValue();
