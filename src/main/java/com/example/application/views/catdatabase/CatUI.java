@@ -10,14 +10,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.HttpURLConnection;
@@ -27,8 +23,7 @@ import java.util.List;
 @Route("")
 public class CatUI extends VerticalLayout {
 
-    private final ServerUrl serverUrl;
-    private String backendUrl;
+    private final String backendUrl;
     private final Grid<Cat> catGrid = new Grid<>(Cat.class);
     private final TextField name = new TextField("Name");
     private final TextField color = new TextField("Color");
@@ -36,7 +31,6 @@ public class CatUI extends VerticalLayout {
 
 
     public CatUI(ServerUrl serverUrl) {
-        this.serverUrl = serverUrl;
         this.backendUrl = serverUrl.getUrl();
 
 
@@ -56,13 +50,15 @@ public class CatUI extends VerticalLayout {
         Button updateCatButton = new Button("Update Cat");
         Button deleteCatButton = new Button("Delete Cat");
         Button swaggerButton = new Button("Swagger Documentation");
-        HorizontalLayout buttonLayout = new HorizontalLayout(addCatButton, updateCatButton, deleteCatButton, swaggerButton);
+        Button clearButton = new Button("Clear Fields");
+        HorizontalLayout buttonLayout = new HorizontalLayout(addCatButton, updateCatButton, deleteCatButton, clearButton, swaggerButton);
         buttonLayout.setSpacing(true);
 
         addCatButton.addClickListener(e -> addCat());
         updateCatButton.addClickListener(e -> updateCat());
         deleteCatButton.addClickListener(e -> deleteCat());
         swaggerButton.addClickListener(e -> navigateToSwaggerUi());
+        clearButton.addClickListener(e -> clearFields());
 
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -74,10 +70,22 @@ public class CatUI extends VerticalLayout {
         } else {
             refreshGrid();
         }
+        catGrid.asSingleSelect().addValueChangeListener(event -> {
+            Cat selectedCat = event.getValue();
+            populateFieldsWithSelectedCatInfo(selectedCat);
+        });
     }
 
+    private void clearFields() {
+        // Clear text fields
+        name.clear();
+        color.clear();
+        age.clear();
+    }
     private void navigateToSwaggerUi() {
-        UI.getCurrent().getPage().setLocation(backendUrl + "/swagger-ui/index.html");
+        UI.getCurrent()
+                .getPage()
+                .setLocation(backendUrl + "/swagger-ui/index.html");
     }
 
     private void addCat() {
@@ -108,10 +116,28 @@ public class CatUI extends VerticalLayout {
         }
     }
 
+    private void populateFieldsWithSelectedCatInfo(Cat selectedCat) {
+        if (selectedCat != null) {
+            name.setValue(selectedCat.getName());
+            color.setValue(selectedCat.getColor());
+            age.setValue(String.valueOf(selectedCat.getAge()));
+        } else {
+            // If no cat is selected, clear the text fields
+            name.clear();
+            color.clear();
+            age.clear();
+        }
+    }
+
+
     private void updateCat() {
         Cat selectedCat = catGrid.asSingleSelect().getValue();
         if (selectedCat != null) {
             try {
+                // Populate the text fields with the selected cat's information
+                populateFieldsWithSelectedCatInfo(selectedCat);
+
+                // Update the selected cat's properties with the values from the text fields
                 selectedCat.setName(name.getValue());
                 selectedCat.setColor(color.getValue());
                 selectedCat.setAge(Integer.parseInt(age.getValue()));
@@ -130,12 +156,13 @@ public class CatUI extends VerticalLayout {
                     Notification.show("Failed to update cat: " + responseEntity.getStatusCode(), 3000, Notification.Position.TOP_CENTER);
                 }
             } catch (NumberFormatException e) {
-                Notification.show("Something went wrong.", 3000, Notification.Position.TOP_CENTER);
+                Notification.show("Please enter a valid age.", 3000, Notification.Position.TOP_CENTER);
             }
         } else {
             Notification.show("Select a cat to update", 3000, Notification.Position.TOP_CENTER);
         }
     }
+
 
     private void deleteCat() {
         Cat selectedCat = catGrid.asSingleSelect().getValue();
@@ -163,7 +190,8 @@ public class CatUI extends VerticalLayout {
                 backendUrl + "/cat/all",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Cat>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -174,7 +202,6 @@ public class CatUI extends VerticalLayout {
             Notification.show("Error fetching cat data: " + responseEntity.getStatusCode());
         }
     }
-
 
     private boolean isServerAvailable() {
         try {
