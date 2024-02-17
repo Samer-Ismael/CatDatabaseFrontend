@@ -36,9 +36,7 @@ public class CatUI extends VerticalLayout {
 
         catGrid.setColumns("id", "name", "color", "age");
 
-        Image image = new Image(new StreamResource("cat.jpg", () -> getClass().getResourceAsStream("/images/cat.jpg")), "Cat Image");
-        image.getElement().getStyle().set("width", "250px");
-        image.getElement().getStyle().set("height", "250px");
+        Image image = getImage();
 
         HorizontalLayout imageLayout = new HorizontalLayout(image);
         imageLayout.setAlignItems(Alignment.START);
@@ -54,11 +52,7 @@ public class CatUI extends VerticalLayout {
         HorizontalLayout buttonLayout = new HorizontalLayout(addCatButton, updateCatButton, deleteCatButton, clearButton, swaggerButton);
         buttonLayout.setSpacing(true);
 
-        addCatButton.addClickListener(e -> addCat());
-        updateCatButton.addClickListener(e -> updateCat());
-        deleteCatButton.addClickListener(e -> deleteCat());
-        swaggerButton.addClickListener(e -> navigateToSwaggerUi());
-        clearButton.addClickListener(e -> clearFields());
+        addListenerToButtons(addCatButton, updateCatButton, deleteCatButton, swaggerButton, clearButton);
 
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -74,6 +68,21 @@ public class CatUI extends VerticalLayout {
             Cat selectedCat = event.getValue();
             populateFieldsWithSelectedCatInfo(selectedCat);
         });
+    }
+
+    private void addListenerToButtons(Button addCatButton, Button updateCatButton, Button deleteCatButton, Button swaggerButton, Button clearButton) {
+        addCatButton.addClickListener(e -> addCat());
+        updateCatButton.addClickListener(e -> updateCat());
+        deleteCatButton.addClickListener(e -> deleteCat());
+        swaggerButton.addClickListener(e -> navigateToSwaggerUi());
+        clearButton.addClickListener(e -> clearFields());
+    }
+
+    private Image getImage() {
+        Image image = new Image(new StreamResource("cat.jpg", () -> getClass().getResourceAsStream("/images/cat.jpg")), "Cat Image");
+        image.getElement().getStyle().set("width", "250px");
+        image.getElement().getStyle().set("height", "250px");
+        return image;
     }
 
     private void clearFields() {
