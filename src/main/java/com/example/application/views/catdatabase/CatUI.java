@@ -234,7 +234,7 @@ public class CatUI extends VerticalLayout {
 
     private boolean isServerAvailable() {
         try {
-            URL url = new URL(backendUrl + "/cat/all");
+            URL url = new URL(backendUrl + "/server");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
